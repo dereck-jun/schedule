@@ -7,7 +7,8 @@ create table if not exists schedules
     todo         varchar(200) not null,
     password     varchar(200) not null,
     created_at   datetime     not null,
-    last_updated datetime     not null
+    last_updated datetime     not null,
+    is_active    boolean      not null default true
 );
 
 # 도전 과제 사용 시
@@ -17,18 +18,20 @@ create table if not exists authors
         primary key,
     email        varchar(45) null,
     created_at   datetime    not null,
-    last_updated datetime    not null
+    last_updated datetime    not null,
+    is_active    boolean     not null default true
 );
 
 create table if not exists schedules
 (
     schedule_id  bigint       not null auto_increment
-        primary key ,
+        primary key,
     author_id    bigint       not null,
     todo         varchar(200) not null,
     password     varchar(45)  not null,
     created_at   datetime     not null,
     last_updated datetime     not null,
+    is_active    boolean      not null default true,
 
     constraint `FK_authors_TO_schedules_1`
         foreign key (author_id) references authors (author_id)

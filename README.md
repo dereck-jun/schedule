@@ -20,19 +20,33 @@
 
 - 빌드 도구: Gradle
 
-- 프레임워크: Spring Boot 3.4.1
+- 프레임워크: Spring Boot 3.3.1
+
+##  깃 클론 시
+
+`src/main/resources/application-dev.yml` 을 만들어주셔야 합니다.
+
+```yml
+# application-dev.yml
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: <YOUR_MYSQL_URL>
+    username: <YOUR_MYSQL_USERNAME>
+    password: <YOUR_MYSQL_PASSWORD>
+```
 
 ## 📖 API 명세서
 
-(명세서 내용이 들어갑니다)
+ - [필수 기능 API 명세서](https://drive.google.com/drive/folders/1hkmoEdLZTY6hXAzFUYwrrq7-23iBRK5j?usp=drive_link)
+ - 도전 기능 API 명세서
 
 ## 🗂 ERD
 
 ### 필수 기능 과제 ERD
 
-![필수 기능 과제 ERD](https://github.com/user-attachments/assets/81e345ff-75b0-47b0-94a6-d6860f6002ad)
+![필수 기능 과제 ERD](https://github.com/user-attachments/assets/79d23272-d677-4648-86a0-14b0caa7eb28)
 
 ### 도전 기능 과제 ERD
 
-![도전 기능 과제 ERD](https://github.com/user-attachments/assets/15cb2f1c-b834-46f1-a8bf-252c2ebcc93f)
-
+![도전 기능 과제 ERD](https://github.com/user-attachments/assets/15129de7-e4e8-4bee-a73e-8d4f731fb923)
