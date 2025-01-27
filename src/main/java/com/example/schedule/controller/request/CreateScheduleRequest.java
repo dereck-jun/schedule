@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CreateScheduleRequest {
     private final String author;
+    private final String email;
     private final String todo;
     private final String password;
 }

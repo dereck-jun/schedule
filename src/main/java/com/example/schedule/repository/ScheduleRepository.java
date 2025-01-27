@@ -8,13 +8,13 @@ import java.util.Optional;
 
 public interface ScheduleRepository {
 
-    Schedule save(String author, String todo, String password);
+    Schedule save(Long authorId, String todo, String password);
 
-    List<Schedule> findAll(String author, LocalDate selectedDate);
+    List<Schedule> findAll(Long authorId, LocalDate selectedDate);
 
-    Optional<Schedule> findById(Long scheduleId);
+    Optional<Schedule> findByScheduleId(Long scheduleId);
 
-    Schedule update(Long scheduleId, String author, String todo);
+    Schedule update(Long scheduleId, String todo);
 
     void delete(Long scheduleId);
 }

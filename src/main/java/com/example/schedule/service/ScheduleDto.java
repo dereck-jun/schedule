@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class ScheduleDto {
     private final Long scheduleId;
-    private final String author;
     private final String todo;
     private final LocalDateTime createdAt;
     private final LocalDateTime lastUpdated;
+    private final Long authorId;
 }

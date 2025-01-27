@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Getter
 @RequiredArgsConstructor
 public class ScheduleSearchCond {
-    private final String author;
+    private final Long authorId;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private final LocalDate selectedDate;

@@ -32,11 +32,11 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
 
 
     @Override
-    public Schedule save(String author, String todo, String password) {
+    public Schedule save(Long authorId, String todo, String password) {
         final LocalDateTime now = LocalDateTime.now();
 
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("author", author)
+        params.addValue("authorId", authorId)
             .addValue("todo", todo)
             .addValue("password", password)
             .addValue("created_at", now)
@@ -47,7 +47,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
 
         return Schedule.builder()
             .id(key.longValue())
-            .author(author)
+            .authorId(authorId)
             .todo(todo)
             .password(password)
             .createdAt(now)
@@ -56,12 +56,13 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     }
 
     @Override
-    public List<Schedule> findAll(String author, LocalDate selectedDate) {
+    public List<Schedule> findAll(Long authorId, LocalDate selectedDate) {
         String sql = "select * from schedules where is_active = true";
+        MapSqlParameterSource params = new MapSqlParameterSource();
 
-        if (StringUtils.hasText(author)) {
-            sql += " and author like concat('%', '" + author + "', '%')";
-
+        if (authorId != null) {
+            sql += " and author_id = :authorId";
+            params.addValue("authorId", authorId);
         }
 
         if (selectedDate != null) {
@@ -70,11 +71,11 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
 
         sql += " order by last_updated desc";
 
-        return jdbcTemplate.query(sql, scheduleRowMapper());
+        return jdbcTemplate.query(sql, params, scheduleRowMapper());
     }
 
     @Override
-    public Optional<Schedule> findById(Long scheduleId) {
+    public Optional<Schedule> findByScheduleId(Long scheduleId) {
         String sql = "select * from schedules where schedule_id = :scheduleId and is_active = true";
         SqlParameterSource param = new MapSqlParameterSource("scheduleId", scheduleId);
 
@@ -83,23 +84,14 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     }
 
     @Override
-    public Schedule update(Long scheduleId, String author, String todo) {
+    public Schedule update(Long scheduleId, String todo) {
         String sql = "update schedules set";
 
-        if (!StringUtils.hasText(author) && StringUtils.hasText(todo)) {
+        if (!StringUtils.hasText(todo)) {
             throw new RuntimeException("변경할 값을 입력해주세요");
         }
 
-        boolean commaFlag = false;
-        if (StringUtils.hasText(author)) {
-            sql += " author = '" + author + "'";
-            commaFlag = true;
-        }
-
         if (StringUtils.hasText(todo)) {
-            if (commaFlag) {
-                sql += ",";
-            }
             sql += " todo = '" + todo + "'";
         }
         sql += ", last_updated = '" + LocalDateTime.now() + "' where schedule_id = :scheduleId and is_active = true";
@@ -125,7 +117,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
         return (rs, rowNum) ->
             Schedule.builder()
                 .id(rs.getLong("schedule_id"))
-                .author(rs.getString("author"))
+                .authorId(rs.getLong("author_id"))
                 .todo(rs.getString("todo"))
                 .password(rs.getString("password"))
                 .createdAt(rs.getTimestamp("created_at").toLocalDateTime())

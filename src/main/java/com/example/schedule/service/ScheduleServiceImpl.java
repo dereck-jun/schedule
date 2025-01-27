@@ -1,23 +1,25 @@
 package com.example.schedule.service;
 
+import com.example.schedule.entity.Author;
 import com.example.schedule.exception.ClientException;
 import com.example.schedule.exception.ScheduleNotFoundException;
 import com.example.schedule.controller.request.CreateScheduleRequest;
 import com.example.schedule.controller.request.DeleteScheduleRequest;
 import com.example.schedule.entity.Schedule;
 import com.example.schedule.mapper.ScheduleMapper;
+import com.example.schedule.repository.AuthorRepository;
 import com.example.schedule.repository.ScheduleRepository;
 import com.example.schedule.controller.request.UpdateScheduleRequest;
 import com.example.schedule.controller.request.ScheduleSearchCond;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.example.schedule.exception.ErrorCode.INVALID_PASSWORD;
-import static com.example.schedule.exception.ErrorCode.SCHEDULE_NOT_FOUND;
+import static com.example.schedule.exception.ErrorCode.*;
 
 @Slf4j
 @Service
@@ -25,19 +27,26 @@ import static com.example.schedule.exception.ErrorCode.SCHEDULE_NOT_FOUND;
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
 
+    private final AuthorRepository authorRepository;
     private final ScheduleRepository scheduleRepository;
     private final ScheduleMapper scheduleMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     public ScheduleDto save(CreateScheduleRequest request) {
-        Schedule createdSchedule = scheduleRepository.save(request.getAuthor(), request.getTodo(), request.getPassword());
+        Author author = authorRepository.findByAuthor(request.getAuthor())
+            .orElseGet(() -> authorRepository.save(request.getAuthor(), request.getEmail()));
+
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+
+        Schedule createdSchedule = scheduleRepository.save(author.getId(), request.getTodo(), encodedPassword);
         return scheduleMapper.scheduleToScheduleDto(createdSchedule);
     }
 
     @Override
     public List<ScheduleDto> findSchedulesByAuthorOrSelectedDate(ScheduleSearchCond cond) {
-        return scheduleRepository.findAll(cond.getAuthor(), cond.getSelectedDate())
+        return scheduleRepository.findAll(cond.getAuthorId(), cond.getSelectedDate())
             .stream()
             .map(scheduleMapper::scheduleToScheduleDto)
             .toList();
@@ -45,35 +54,41 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public ScheduleDto findById(Long scheduleId) {
-        Schedule findSchedule = scheduleRepository.findById(scheduleId)
+        Schedule findSchedule = scheduleRepository.findByScheduleId(scheduleId)
             .orElseThrow(() -> new ScheduleNotFoundException(SCHEDULE_NOT_FOUND));
         return scheduleMapper.scheduleToScheduleDto(findSchedule);
     }
 
     @Override
     @Transactional
-    public ScheduleDto update(Long scheduleId, UpdateScheduleRequest dto) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
+    public ScheduleDto update(Long scheduleId, UpdateScheduleRequest request) {
+        Schedule schedule = scheduleRepository.findByScheduleId(scheduleId)
             .orElseThrow(() -> new ScheduleNotFoundException(SCHEDULE_NOT_FOUND));
 
-        if (!schedule.getPassword().equals(dto.getPassword())) {
-            throw new ClientException(INVALID_PASSWORD);
-        }
+        Author author = authorRepository.findById(schedule.getAuthorId())
+            .orElseThrow(() -> new ScheduleNotFoundException(AUTHOR_NOT_FOUND));
 
-        Schedule updatedSchedule = scheduleRepository.update(scheduleId, dto.getAuthor(), dto.getTodo());
+        passwordValidation(request.getPassword(), schedule);
+
+        Schedule updatedSchedule = scheduleRepository.update(scheduleId, request.getTodo());
+        authorRepository.update(author.getAuthor());
         return scheduleMapper.scheduleToScheduleDto(updatedSchedule);
     }
 
     @Override
     @Transactional
     public void delete(Long scheduleId, DeleteScheduleRequest request) {
-        Schedule findSchedule = scheduleRepository.findById(scheduleId)
+        Schedule findSchedule = scheduleRepository.findByScheduleId(scheduleId)
             .orElseThrow(() -> new ScheduleNotFoundException(SCHEDULE_NOT_FOUND));
 
-        if (!findSchedule.getPassword().equals(request.getPassword())) {
-            throw new ClientException(INVALID_PASSWORD);
-        }
+        passwordValidation(request.getPassword(), findSchedule);
 
         scheduleRepository.delete(scheduleId);
+    }
+
+    private void passwordValidation(String password, Schedule schedule) {
+        if (!passwordEncoder.matches(password, schedule.getPassword())) {
+            throw new ClientException(INVALID_PASSWORD);
+        }
     }
 }

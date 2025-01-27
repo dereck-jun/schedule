@@ -25,6 +25,9 @@ repositories {
 
 dependencies {
 
+    // spring security crypto
+    implementation 'org.springframework.security:spring-security-crypto'
+
     // spring data jdbc
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 
