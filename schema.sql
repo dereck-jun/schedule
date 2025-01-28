@@ -16,10 +16,13 @@ create table if not exists authors
 (
     author_id    bigint      not null auto_increment
         primary key,
-    email        varchar(45) null,
+    author       varchar(45) not null
+        unique,
+    email        varchar(45) not null
+        unique,
     created_at   datetime    not null,
     last_updated datetime    not null,
-    is_active    boolean     not null default true
+    is_active    boolean     not null
 );
 
 create table if not exists schedules
@@ -28,7 +31,7 @@ create table if not exists schedules
         primary key,
     author_id    bigint       not null,
     todo         varchar(200) not null,
-    password     varchar(45)  not null,
+    password     varchar(255) not null,
     created_at   datetime     not null,
     last_updated datetime     not null,
     is_active    boolean      not null default true,
