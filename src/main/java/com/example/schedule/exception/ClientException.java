@@ -8,7 +8,7 @@ public class ClientException extends RuntimeException {
 
     private ErrorCode errorCode;
 
-    public ClientException(String message) {
+    public ClientException(ErrorCode errorCode, String message) {
         super(message);
     }
 
@@ -16,5 +16,4 @@ public class ClientException extends RuntimeException {
     public ClientException(ErrorCode errorCode) {
         this.errorCode = errorCode;
     }
-
 }

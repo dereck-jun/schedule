@@ -56,26 +56,45 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     }
 
     @Override
-    public List<Schedule> findAll(Long authorId, LocalDate selectedDate) {
-        String sql = "select * from schedules where is_active = true";
+    public List<ScheduleWithAuthor> findAll(Long authorId, LocalDate selectedDate, int page, int size) {
+        int offset = (page - 1) * size;
+        String sql = "select * from schedules s inner join authors a on s.author_id = a.author_id where s.is_active = true and a.is_active = true";
         MapSqlParameterSource params = new MapSqlParameterSource();
 
         if (authorId != null) {
-            sql += " and author_id = :authorId";
+            sql += " and a.author_id = :authorId";
             params.addValue("authorId", authorId);
         }
 
         if (selectedDate != null) {
-            sql += " and last_updated between '" + selectedDate + "' and date_add('" + selectedDate + "', interval '23:59:59' hour_second)";
+            sql += " and s.last_updated between '" + selectedDate + "' and date_add('" + selectedDate + "', interval '23:59:59' hour_second)";
         }
 
-        sql += " order by last_updated desc";
+        sql += " order by s.last_updated desc";
 
-        return jdbcTemplate.query(sql, params, scheduleRowMapper());
+        sql += " limit :size offset :offset";
+        params.addValue("size", size)
+            .addValue("offset", offset);
+
+        return jdbcTemplate.query(sql, params, (rs, rowNum) ->
+            ScheduleWithAuthor.builder()
+                .scheduleId(rs.getLong("schedule_id"))
+                .todo(rs.getString("todo"))
+                .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                .lastUpdated(rs.getTimestamp("last_updated").toLocalDateTime())
+                .name(rs.getString("name"))
+                .build()
+        );
     }
 
     @Override
-    public Optional<Schedule> findByScheduleId(Long scheduleId) {
+    public long count() {
+        String sql = "select count(*) from schedules s inner join authors a on s.author_id = a.author_id where s.is_active = true and a.is_active = true";
+        return jdbcTemplate.queryForObject(sql, new MapSqlParameterSource(), Long.class);
+    }
+
+    @Override
+    public Optional<Schedule> findById(Long scheduleId) {
         String sql = "select * from schedules where schedule_id = :scheduleId and is_active = true";
         SqlParameterSource param = new MapSqlParameterSource("scheduleId", scheduleId);
 

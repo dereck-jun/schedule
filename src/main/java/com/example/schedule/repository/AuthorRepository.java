@@ -6,11 +6,15 @@ import java.util.Optional;
 
 public interface AuthorRepository {
 
-    Author save(String author, String email);
+    Author save(String name, String email);
 
-    Author update(String author);
+    Author update(Long authorId, String name);
 
     Optional<Author> findById(Long authorId);
 
-    Optional<Author> findByAuthor(String author);
+    Optional<Author> findAuthorByName(String name);
+
+    Optional<Author> findAuthorByEmail(String email);
+
+    Optional<Author> findAuthorByNameOrEmail(String name, String email);
 }

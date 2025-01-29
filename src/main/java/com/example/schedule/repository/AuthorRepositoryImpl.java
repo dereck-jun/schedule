@@ -25,12 +25,23 @@ public class AuthorRepositoryImpl implements AuthorRepository {
             .usingGeneratedKeyColumns("author_id");
     }
 
+    private static RowMapper<Author> authorRowMapper() {
+        return (rs, rowNum) ->
+            Author.builder()
+                .id(rs.getLong("author_id"))
+                .name(rs.getString("name"))
+                .email(rs.getString("email"))
+                .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                .lastUpdated(rs.getTimestamp("last_updated").toLocalDateTime())
+                .build();
+    }
+
     @Override
-    public Author save(String author, String email) {
+    public Author save(String name, String email) {
         LocalDateTime now = LocalDateTime.now();
 
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("author", author)
+        params.addValue("name", name)
             .addValue("email", email)
             .addValue("created_at", now)
             .addValue("last_updated", now)
@@ -40,7 +51,7 @@ public class AuthorRepositoryImpl implements AuthorRepository {
 
         return Author.builder()
             .id(key.longValue())
-            .author(author)
+            .name(name)
             .email(email)
             .createdAt(now)
             .lastUpdated(now)
@@ -48,15 +59,16 @@ public class AuthorRepositoryImpl implements AuthorRepository {
     }
 
     @Override
-    public Author update(String author) {
-        String sql = "update authors set author = :author";
-
+    public Author update(Long authorId, String name) {
+        String sql = "update authors set name = :name, last_updated = '" + LocalDateTime.now() + "'";
+        sql += " where author_id = :authorId and is_active = true";
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("author", author);
+        params.addValue("name", name)
+            .addValue("authorId", authorId);
 
         jdbcTemplate.update(sql, params);
 
-        sql = "select * from authors where author = :author and is_active = true";
+        sql = "select * from authors where name = :name and is_active = true";
 
         return jdbcTemplate.queryForObject(sql, params, authorRowMapper());
     }
@@ -74,25 +86,36 @@ public class AuthorRepositoryImpl implements AuthorRepository {
     }
 
     @Override
-    public Optional<Author> findByAuthor(String author) {
-        String sql = "select * from authors where author = :author";
+    public Optional<Author> findAuthorByName(String name) {
+        String sql = "select * from authors where name = :name";
 
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("author", author);
+        params.addValue("name", name);
 
         List<Author> authors = jdbcTemplate.query(sql, params, authorRowMapper());
 
         return authors.stream().findFirst();
     }
 
-    private static RowMapper<Author> authorRowMapper() {
-        return (rs, rowNum) ->
-            Author.builder()
-                .id(rs.getLong("author_id"))
-                .author(rs.getString("author"))
-                .email(rs.getString("email"))
-                .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
-                .lastUpdated(rs.getTimestamp("last_updated").toLocalDateTime())
-                .build();
+    @Override
+    public Optional<Author> findAuthorByEmail(String email) {
+        String sql = "select * from authors where email = :email and is_active = true";
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("email", email);
+
+        List<Author> authors = jdbcTemplate.query(sql, params, authorRowMapper());
+
+        return authors.stream().findFirst();
+    }
+
+    @Override
+    public Optional<Author> findAuthorByNameOrEmail(String name, String email) {
+        String sql = "select * from authors where name = :name or email = :email and is_active = true";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("name", name)
+            .addValue("email", email);
+
+        return jdbcTemplate.query(sql, params, authorRowMapper()).stream().findFirst();
     }
 }

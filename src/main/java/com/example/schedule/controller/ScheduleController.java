@@ -2,8 +2,10 @@ package com.example.schedule.controller;
 
 import com.example.schedule.controller.request.CreateScheduleRequest;
 import com.example.schedule.controller.request.DeleteScheduleRequest;
+import com.example.schedule.controller.request.GetSchedulesRequest;
 import com.example.schedule.controller.request.UpdateScheduleRequest;
-import com.example.schedule.controller.request.ScheduleSearchCond;
+import com.example.schedule.repository.ScheduleWithAuthor;
+import com.example.schedule.service.PageDto;
 import com.example.schedule.service.ScheduleDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,8 +14,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.List;
 
 @Tag(name = "Schedule", description = "Schedule 관련 API 입니다.")
 public interface ScheduleController {
@@ -28,7 +28,7 @@ public interface ScheduleController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "일정 전체 조회 성공"),
         @ApiResponse(responseCode = "400", description = "일정 전체 조회 실패(날짜 데이터 포맷 형식)")})
-    com.example.schedule.controller.response.ApiResponse<List<ScheduleDto>> findAllSchedules(@ModelAttribute ScheduleSearchCond cond);
+    com.example.schedule.controller.response.ApiResponse<PageDto<ScheduleWithAuthor>> findAllSchedules(@ModelAttribute GetSchedulesRequest request);
 
     @Operation(summary = "일정 단건 조회", description = "ID 값에 일치하는 일정을 가져옵니다.")
     @ApiResponses(value = {

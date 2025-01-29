@@ -1,5 +1,7 @@
 package com.example.schedule.controller.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -7,7 +9,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UpdateScheduleRequest {
 
+    @NotBlank
+    @Size(max = 200)
     private final String todo;
-    private final String author;
+
+    @NotBlank
+    @Size(max = 45)
+    private final String name;
+
+    @NotBlank
     private final String password;
 }

@@ -7,8 +7,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-import java.util.List;
-
 @Mapper(
     componentModel = "spring",  // spring bean 으로 생성
     injectionStrategy = InjectionStrategy.CONSTRUCTOR,  // 생성자 주입
@@ -19,8 +17,4 @@ public interface ScheduleMapper {
     @Mapping(target = "scheduleId", source = "id")
     ScheduleDto scheduleToScheduleDto(Schedule schedule);
 
-    List<ScheduleDto> schedulesToScheduleDtos(List<Schedule> schedules);
-
-//    @Mapping(target = "id", source = "scheduleId")
-//    Schedule scheduleDtoToSchedule(ScheduleDto scheduleDto);
 }
