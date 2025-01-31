@@ -22,7 +22,7 @@
 
 - 프레임워크: Spring Boot 3.3.1
 
-##  깃 클론 시
+### 깃 클론 시
 
 `src/main/resources/application-dev.yml` 을 만들어주셔야 합니다.
 
@@ -38,8 +38,8 @@ spring:
 
 ## 📖 API 명세서
 
- - [필수 기능 API 명세서](https://drive.google.com/drive/folders/1hkmoEdLZTY6hXAzFUYwrrq7-23iBRK5j?usp=drive_link)
- - 도전 기능 API 명세서
+ - [필수 기능 API 명세서](https://drive.google.com/file/d/1ZUDtN9jHD7OVdez25yI6DP-017wke2k3/view?usp=sharing)
+ - [도전 기능 API 명세서](https://drive.google.com/file/d/1t5zcbu3MaLt0j1Cv1-4RzQEIgyX_mWxO/view?usp=sharing)
 
 ## 🗂 ERD
 
@@ -49,4 +49,4 @@ spring:
 
 ### 도전 기능 과제 ERD
 
-![도전 기능 과제 ERD](https://github.com/user-attachments/assets/15129de7-e4e8-4bee-a73e-8d4f731fb923)
+![도전 기능 과제 ERD](https://github.com/user-attachments/assets/288f12a4-9fd4-43e5-9963-fa084ec8acfc)

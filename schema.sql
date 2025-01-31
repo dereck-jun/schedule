@@ -5,7 +5,7 @@ create table if not exists schedules
         primary key,
     author       varchar(45)  not null,
     todo         varchar(200) not null,
-    password     varchar(200) not null,
+    password     varchar(255) not null,
     created_at   datetime     not null,
     last_updated datetime     not null,
     is_active    boolean      not null default true
@@ -16,7 +16,7 @@ create table if not exists authors
 (
     author_id    bigint      not null auto_increment
         primary key,
-    author       varchar(45) not null
+    name         varchar(45) not null
         unique,
     email        varchar(45) not null
         unique,
@@ -34,7 +34,7 @@ create table if not exists schedules
     password     varchar(255) not null,
     created_at   datetime     not null,
     last_updated datetime     not null,
-    is_active    boolean      not null default true,
+    is_active    boolean      not null,
 
     constraint `FK_authors_TO_schedules_1`
         foreign key (author_id) references authors (author_id)
