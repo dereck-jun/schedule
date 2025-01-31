@@ -12,6 +12,8 @@ import com.example.schedule.mapper.ScheduleMapper;
 import com.example.schedule.repository.AuthorRepository;
 import com.example.schedule.repository.ScheduleRepository;
 import com.example.schedule.repository.ScheduleWithAuthor;
+import com.example.schedule.service.dto.PageDto;
+import com.example.schedule.service.dto.ScheduleDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,48 +39,48 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     @Transactional
     public ScheduleDto save(CreateScheduleRequest request) {
-        // TODO: 중복 검사를 실행할 수 있는지? -> 로그인 기능이 없으니 유저를 솎아낼 수 없다고 생각함
-        // Why? 보통 로그인을 실행한 뒤에 메인 기능들을 사용할 수 있지만 현재 로그인 기능이 없기 때문에 유저의 유무를 확인해도 의미가 없음
-        // 유저가 있으면 password 만을 다르게 하여 일정을 잠궈놓기 때문임
-        Author author = authorRepository.findAuthorByNameOrEmail(request.getName(), request.getEmail())
-            .orElseGet(() -> authorRepository.save(request.getName(), request.getEmail()));
+        Optional<Author> findAuthor = authorRepository.findByEmail(request.getName(), request.getEmail());
+        if (findAuthor.isPresent()) {
+            return createSchedule(findAuthor.get(), request);
+        }
 
-        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        if (authorRepository.existsByName(request.getName())) {
+            throw new ClientException("name", AUTHOR_NAME_DUPLICATED);
+        } else if (authorRepository.existsByEmail(request.getEmail())) {
+            throw new ClientException("email", EMAIL_DUPLICATED);
+        }
 
-        Schedule createdSchedule = scheduleRepository.save(author.getId(), request.getTodo(), encodedPassword);
-        return scheduleMapper.scheduleToScheduleDto(createdSchedule);
+        Author newAuthor = authorRepository.save(request.getName(), request.getEmail());
+        return createSchedule(newAuthor, request);
     }
 
     @Override
     public PageDto<ScheduleWithAuthor> findAll(GetSchedulesRequest request) {
-        List<ScheduleWithAuthor> dtos = scheduleRepository.findAll(request.getAuthorId(), request.getSelectedDate(), request.getPage(), request.getSize());
+        List<ScheduleWithAuthor> resultList = scheduleRepository.findAll(request.getAuthorId(), request.getSelectedDate(), request.getPage(), request.getSize());
 
         long totalCount = scheduleRepository.count();
         int totalPages = (int) Math.ceil((double) totalCount / request.getSize());
-        return new PageDto<>(dtos, request.getPage(), request.getSize(), totalCount, totalPages);
+        return new PageDto<>(resultList, request.getPage(), request.getSize(), totalCount, totalPages);
     }
 
     @Override
     public ScheduleDto findById(Long scheduleId) {
-        Schedule findSchedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow(() -> new ScheduleNotFoundException(SCHEDULE_NOT_FOUND));
+        Schedule findSchedule = getScheduleOrThrowException(scheduleId);
         return scheduleMapper.scheduleToScheduleDto(findSchedule);
     }
 
     @Override
     @Transactional
     public ScheduleDto update(Long scheduleId, UpdateScheduleRequest request) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow(() -> new ScheduleNotFoundException(SCHEDULE_NOT_FOUND));
+        Schedule schedule = getScheduleOrThrowException(scheduleId);
 
         Author author = authorRepository.findById(schedule.getAuthorId())
             .orElseThrow(() -> new ScheduleNotFoundException(AUTHOR_NOT_FOUND));
 
         passwordCheck(request.getPassword(), schedule);
 
-        Optional<Author> authorByName = authorRepository.findAuthorByName(request.getName());
-        if (authorByName.isPresent()) {
-            throw new ClientException(AUTHOR_NAME_DUPLICATED);
+        if (authorRepository.existsByName(request.getName())) {
+            throw new ClientException("name", AUTHOR_NAME_DUPLICATED);
         }
 
         authorRepository.update(author.getId(), request.getName());
@@ -89,17 +91,27 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     @Transactional
     public void delete(Long scheduleId, DeleteScheduleRequest request) {
-        Schedule findSchedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow(() -> new ScheduleNotFoundException(SCHEDULE_NOT_FOUND));
+        Schedule findSchedule = getScheduleOrThrowException(scheduleId);
 
         passwordCheck(request.getPassword(), findSchedule);
 
         scheduleRepository.delete(scheduleId);
     }
 
+    private ScheduleDto createSchedule(Author author, CreateScheduleRequest request) {
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        Schedule createdSchedule = scheduleRepository.save(author.getId(), request.getTodo(), encodedPassword);
+        return scheduleMapper.scheduleToScheduleDto(createdSchedule);
+    }
+
+    private Schedule getScheduleOrThrowException(Long scheduleId) {
+        return scheduleRepository.findById(scheduleId)
+            .orElseThrow(() -> new ScheduleNotFoundException(SCHEDULE_NOT_FOUND));
+    }
+
     private void passwordCheck(String password, Schedule schedule) {
         if (!passwordEncoder.matches(password, schedule.getPassword())) {
-            throw new ClientException(INVALID_PASSWORD);
+            throw new ClientException("password", INVALID_PASSWORD);
         }
     }
 }

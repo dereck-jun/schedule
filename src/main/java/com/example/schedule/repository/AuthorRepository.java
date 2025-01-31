@@ -8,13 +8,13 @@ public interface AuthorRepository {
 
     Author save(String name, String email);
 
-    Author update(Long authorId, String name);
+    void update(Long authorId, String name);
 
     Optional<Author> findById(Long authorId);
 
-    Optional<Author> findAuthorByName(String name);
+    Optional<Author> findByEmail(String name, String email);
 
-    Optional<Author> findAuthorByEmail(String email);
+    boolean existsByName(String name);
 
-    Optional<Author> findAuthorByNameOrEmail(String name, String email);
+    boolean existsByEmail(String email);
 }

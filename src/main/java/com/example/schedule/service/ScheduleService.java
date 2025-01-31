@@ -5,6 +5,8 @@ import com.example.schedule.controller.request.DeleteScheduleRequest;
 import com.example.schedule.controller.request.GetSchedulesRequest;
 import com.example.schedule.controller.request.UpdateScheduleRequest;
 import com.example.schedule.repository.ScheduleWithAuthor;
+import com.example.schedule.service.dto.PageDto;
+import com.example.schedule.service.dto.ScheduleDto;
 
 public interface ScheduleService {
 

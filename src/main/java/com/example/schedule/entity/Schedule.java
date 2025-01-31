@@ -29,12 +29,13 @@ public class Schedule {
     private boolean isActive;
 
     @Builder
-    public Schedule(Long id, Long authorId, String todo, String password, LocalDateTime createdAt, LocalDateTime lastUpdated) {
+    public Schedule(Long id, Long authorId, String todo, String password, LocalDateTime createdAt, LocalDateTime lastUpdated, boolean isActive) {
         this.id = id;
         this.authorId = authorId;
         this.todo = todo;
         this.password = password;
         this.createdAt = createdAt;
         this.lastUpdated = lastUpdated;
+        this.isActive = isActive;
     }
 }

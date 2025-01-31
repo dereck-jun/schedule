@@ -1,7 +1,7 @@
 package com.example.schedule.mapper;
 
 import com.example.schedule.entity.Schedule;
-import com.example.schedule.service.ScheduleDto;
+import com.example.schedule.service.dto.ScheduleDto;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -1,14 +1,12 @@
 package com.example.schedule.repository;
 
 import com.example.schedule.entity.Schedule;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.time.LocalDate;
@@ -16,7 +14,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Repository
 public class ScheduleRepositoryImpl implements ScheduleRepository {
 
@@ -33,7 +30,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
 
     @Override
     public Schedule save(Long authorId, String todo, String password) {
-        final LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("authorId", authorId)
@@ -90,7 +87,8 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     @Override
     public long count() {
         String sql = "select count(*) from schedules s inner join authors a on s.author_id = a.author_id where s.is_active = true and a.is_active = true";
-        return jdbcTemplate.queryForObject(sql, new MapSqlParameterSource(), Long.class);
+        Long count = jdbcTemplate.queryForObject(sql, new MapSqlParameterSource(), Long.class);
+        return count != null ? count : 0;
     }
 
     @Override
@@ -104,18 +102,12 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
 
     @Override
     public Schedule update(Long scheduleId, String todo) {
-        String sql = "update schedules set";
+        String sql = "update schedules set todo = :todo, last_updated = '" + LocalDateTime.now() + "' where schedule_id = :scheduleId and is_active = true";
 
-        if (!StringUtils.hasText(todo)) {
-            throw new RuntimeException("변경할 값을 입력해주세요");
-        }
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("todo", todo)
+            .addValue("scheduleId", scheduleId);
 
-        if (StringUtils.hasText(todo)) {
-            sql += " todo = '" + todo + "'";
-        }
-        sql += ", last_updated = '" + LocalDateTime.now() + "' where schedule_id = :scheduleId and is_active = true";
-
-        SqlParameterSource params = new MapSqlParameterSource("scheduleId", scheduleId);
         jdbcTemplate.update(sql, params);
 
         sql = "select * from schedules where schedule_id = :scheduleId and is_active = true";

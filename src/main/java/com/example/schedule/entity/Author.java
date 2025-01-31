@@ -26,11 +26,12 @@ public class Author {
     private boolean isActive;
 
     @Builder
-    public Author(Long id, String name, String email, LocalDateTime createdAt, LocalDateTime lastUpdated) {
+    public Author(Long id, String name, String email, LocalDateTime createdAt, LocalDateTime lastUpdated, boolean isActive) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.createdAt = createdAt;
         this.lastUpdated = lastUpdated;
+        this.isActive = isActive;
     }
 }
