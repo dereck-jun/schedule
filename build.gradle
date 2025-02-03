@@ -24,6 +24,7 @@ repositories {
 }
 
 dependencies {
+
     // spring data jdbc
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 
@@ -32,10 +33,16 @@ dependencies {
 
     // spring web
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
+    // map struct
+    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
     // mysql driver
     runtimeOnly 'com.mysql:mysql-connector-j'
