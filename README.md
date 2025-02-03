@@ -24,9 +24,7 @@
 
 - 데이터베이스: MySQL 8.3.0
 
-### 깃 클론 시
-
-`src/main/resources/application-dev.yml` 을 만들어주셔야 합니다.
+> 깃 클론 시 `src/main/resources/application-dev.yml` 을 만들어주셔야 합니다.
 
 ```yml
 # application-dev.yml
@@ -47,8 +45,11 @@ spring:
 
 ### 필수 기능 과제 ERD
 
-![필수 기능 과제 ERD](https://github.com/user-attachments/assets/79d23272-d677-4648-86a0-14b0caa7eb28)
+![필수 기능 과제 ERD](https://github.com/user-attachments/assets/a0125d63-46fc-40d1-95aa-01748122e5c4)
 
 ### 도전 기능 과제 ERD
 
-![도전 기능 과제 ERD](https://github.com/user-attachments/assets/c38045d2-f2d2-4d1e-b0af-0dba89a11d2d)
+![도전 기능 과제 ERD](https://github.com/user-attachments/assets/f94e324f-5d99-4c2b-876c-74d77b8350b1)
+
+## 🔫 트러블 슈팅
+[일정 관리 애플리케이션](https://velog.io/@dereck-jun/%EC%9D%BC%EC%A0%95-%EA%B4%80%EB%A6%AC-%EC%95%A0%ED%94%8C%EB%A6%AC%EC%BC%80%EC%9D%B4%EC%85%98-%ED%8A%B8%EB%9F%AC%EB%B8%94-%EC%8A%88%ED%8C%85)
