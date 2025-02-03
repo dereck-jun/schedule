@@ -1,13 +1,16 @@
 package com.example.schedule.controller.response;
 
 import com.example.schedule.exception.ErrorCode;
+import com.example.schedule.exception.ErrorDetail;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -15,19 +18,19 @@ import java.time.LocalDateTime;
 public class ApiResponse<T> {
 
     private boolean success;
-    private int code;
+    private HttpStatus status;
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private T data;
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
-    private ErrorCode errorCode;
+    private List<ErrorDetail> errorDetails;
     private String message;
     private LocalDateTime timeStamp;
 
-    public static <T> ApiResponse<T> success(int code, T data, String message) {
-        return new ApiResponse<>(true, code, data, null, message, LocalDateTime.now());
+    public static <T> ApiResponse<T> success(HttpStatus status, T data, String message) {
+        return new ApiResponse<>(true, status, data, null, message, LocalDateTime.now());
     }
 
-    public static <T> ApiResponse<T> failure(int code, ErrorCode errorCode, String message) {
-        return new ApiResponse<>(false, code, null, errorCode, message, LocalDateTime.now());
+    public static <T> ApiResponse<T> failure(HttpStatus status, List<ErrorDetail> errorDetails, String message) {
+        return new ApiResponse<>(false, status, null, errorDetails, message, LocalDateTime.now());
     }
 }

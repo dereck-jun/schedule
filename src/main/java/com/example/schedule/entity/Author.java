@@ -10,18 +10,15 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.time.LocalDateTime;
 
 @Getter
-@Table(name = "schedules")
+@Table(name = "authors")
 @NoArgsConstructor
-public class Schedule {
+public class Author {
 
     @Id
-    @Column(value = "schedule_id")
-    private Long id;
-
     @Column(value = "author_id")
-    private Long authorId;
-    private String todo;
-    private String password;
+    private Long id;
+    private String name;
+    private String email;
     private LocalDateTime createdAt;
     private LocalDateTime lastUpdated;
 
@@ -29,11 +26,10 @@ public class Schedule {
     private boolean isActive;
 
     @Builder
-    public Schedule(Long id, Long authorId, String todo, String password, LocalDateTime createdAt, LocalDateTime lastUpdated, boolean isActive) {
+    public Author(Long id, String name, String email, LocalDateTime createdAt, LocalDateTime lastUpdated, boolean isActive) {
         this.id = id;
-        this.authorId = authorId;
-        this.todo = todo;
-        this.password = password;
+        this.name = name;
+        this.email = email;
         this.createdAt = createdAt;
         this.lastUpdated = lastUpdated;
         this.isActive = isActive;
