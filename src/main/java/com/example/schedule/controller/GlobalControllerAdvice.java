@@ -37,7 +37,7 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(value = ClientException.class)
     public ApiResponse<ErrorDetail> clientBadRequestExceptionHandler(ClientException ce) {
-        log.error("[ClientException] : {}", "중복된 이메일로 인한 예외 발생", ce);
+        log.error("[ClientException] : {}", "클라이언트 예외 발생", ce);
         ErrorCode errorCode = ce.getErrorCode();
         ErrorDetail detail = new ErrorDetail(ce.getField(), errorCode, errorCode.getMessage());
         if (errorCode == EMAIL_DUPLICATED || errorCode == AUTHOR_NAME_DUPLICATED) {
