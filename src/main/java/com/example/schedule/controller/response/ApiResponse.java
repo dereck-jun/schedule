@@ -1,6 +1,5 @@
 package com.example.schedule.controller.response;
 
-import com.example.schedule.exception.ErrorCode;
 import com.example.schedule.exception.ErrorDetail;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;

@@ -26,24 +26,28 @@ public class ScheduleControllerImpl implements ScheduleController {
     private final ScheduleService scheduleService;
 
     @PostMapping
+    @Override
     public ApiResponse<ScheduleDto> createSchedule(@Valid @RequestBody CreateScheduleRequest request) {
         ScheduleDto createdSchedule = scheduleService.save(request);
         return ApiResponse.success(OK, createdSchedule, "일정 생성 성공");
     }
 
     @GetMapping
+    @Override
     public ApiResponse<PageDto<ScheduleWithAuthor>> findAllSchedules(@Valid @ModelAttribute GetSchedulesRequest request) {
         PageDto<ScheduleWithAuthor> authorDtoPageDto = scheduleService.findAll(request);
         return ApiResponse.success(OK, authorDtoPageDto, "일정 전체 조회 성공");
     }
 
     @GetMapping("/{scheduleId}")
+    @Override
     public ApiResponse<ScheduleDto> findScheduleById(@PathVariable(value = "scheduleId") Long id) {
         ScheduleDto findSchedule = scheduleService.findById(id);
         return ApiResponse.success(OK, findSchedule, "일정 단건 조회 성공");
     }
 
     @PatchMapping("/{scheduleId}")
+    @Override
     public ApiResponse<ScheduleDto> updateSchedule(@PathVariable("scheduleId") Long id,
                                                    @Valid @RequestBody UpdateScheduleRequest request) {
         ScheduleDto updatedSchedule = scheduleService.update(id, request);
@@ -51,6 +55,7 @@ public class ScheduleControllerImpl implements ScheduleController {
     }
 
     @DeleteMapping("/{scheduleId}")
+    @Override
     public ApiResponse<Void> deleteSchedule(@PathVariable("scheduleId") Long id,
                                             @Valid @RequestBody DeleteScheduleRequest request) {
         scheduleService.delete(id, request);
